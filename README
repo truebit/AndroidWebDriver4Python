@@ -1,1 +1,74 @@
-As I could not find Android WebDriver implementation in Selenium PythonBindings,and I really like Python as opposed to Java. So I want to implement one.
+============
+Introduction
+============
+
+:Author: Sean Wang
+
+AndroidWebDriver4Python is an add-on to Selenium Python Client Driver.
+Its source code could be found from 
+http://code.google.com/p/selenium/source/browse/trunk/py
+
+As I could not find Android WebDriver implementation in it,
+and I really like Python as opposed to Java. So I want to implement one.
+
+More infomation about Selenium, plz check http://code.google.com/p/selenium/
+
+============
+Installing
+============
+
+As I am a newbie, I do not expect to commit in the Selenium project.
+To install this AndroidDriver for Python, you need:
+1. download and extract Python client from http://pypi.python.org/pypi/selenium#downloads
+2. download AndroidWebDriver4Python from using git clone git://github.com/truebit/AndroidWebDriver4Python.git
+3. navigate to ../selenium-2.x.x/py/selenium/webdriver
+4. copy the entire folder of android under AndroidWebDriver4Python to above
+directory
+5. add one line in file __init__.py in directory that was mentioned in step 3:
+    from android.webdriver import WebDriver as Android
+   put this line besides other similiar looked lines
+6. back to the root directory of Selenium Python Client, to install this
+modified version using command:
+    python setup.py setup
+
+Here you have installed this AndroidWebDriver4Python add-on.
+There are some prerequisites to use AndroidWebDriver4Python.
+
+7. Install Android SDK and set 'tools' and 'platform-tools' in your PATH:
+http://developer.android.com/sdk/installing.html
+
+8. Install Android server side application on your device:
+    Download android-server-2.x.x.apk from 
+    http://code.google.com/p/selenium/downloads/list
+
+9. enable 'USB Debugging' in your device, which normally could found from:
+    Settings>Applications>Development>USB debugging
+
+10. connect USB cable between device and PC, install adb drivers
+
+For more information you could check
+http://code.google.com/p/selenium/downloads/list,but you do not need to do all
+those steps. Above 3 steps is all you need to do.
+
+
+============
+Example
+============
+
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+driver= webdriver.Android()
+driver.get("http://www.symbio.com")
+
+============
+Documentation
+============
+
+The latest Selenium Python documentation covers all So plz check latest documentation
+at http://http://readthedocs.org/docs/selenium-python/en/latest
+
+Use The Source Luke!
+====================
+
+http://code.google.com/p/selenium/source/browse/trunk/py/selenium/webdriver/remote/webdriver.py
