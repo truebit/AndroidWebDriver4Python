@@ -29,7 +29,7 @@ directory
    put this line besides other similiar looked lines
 6. back to the root directory of Selenium Python Client, to install this
 modified version using command:
-    python setup.py setup
+    python setup.py install
 
 Here you have installed this AndroidWebDriver4Python add-on.
 There are some prerequisites to use AndroidWebDriver4Python.
