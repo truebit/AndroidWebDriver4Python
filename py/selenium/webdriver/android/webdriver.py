@@ -5,8 +5,8 @@ from service import Service
 
 class WebDriver(RemoteWebDriver):
 
-    def __init__(self):
-        self.service = Service()
+    def __init__(self,deviceID=None):
+        self.service = Service(deviceID)
         self.service.start()
         RemoteWebDriver.__init__(self,
             command_executor=self.service.service_url,
@@ -21,5 +21,6 @@ class WebDriver(RemoteWebDriver):
         finally:
             self.service.stop()
 if __name__ == '__main__':
-    driver= WebDriver()
+    driver= WebDriver('emulator-5554')
     driver.get("http://www.symbio.com")
+    driver.quit()

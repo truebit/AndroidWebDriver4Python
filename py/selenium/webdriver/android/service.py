@@ -90,7 +90,7 @@ class Service(object):
     def runAdbCmd(cmd):
         """run an adb command which has no output if successful"""
         out=''
-        out=subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        out=subprocess.check_output(cmd, stderr=subprocess.STDOUT,shell=True)
         if out:
             raise WebDriverException(out)
 
@@ -100,12 +100,16 @@ class Service(object):
                 WebDriverException : Raised either when it can't start the service
                     or when it can't connect to the service"""
 
-        print 'start forward'
+        print 'start tcp port 8080 forwarding'
         Service.runAdbCmd('%s forward tcp:8080 tcp:8080'%self.adbCmd)
-        print 'start press back 4 times'
+        print 'stop existing android server by sending back key'
+        # this is not mandatory as we already killed adb server, but could this
+        # decrease the webview created in andriod server application. maybe
+        # it's a bug to create one webview per launch of app?
         for i in xrange(4):
-            (r'%s shell input keyevent 4'%self.adbCmd)
-        print 'start activity'
+            Service.runAdbCmd(r'%s shell input keyevent 4'%self.adbCmd)
+
+        print 'start android server activity'
         err=subprocess.Popen(r'%s shell am start -n org.openqa.selenium.android.app/.MainActivity'%self.adbCmd
                 ,stderr=PIPE,stdout=PIPE).communicate()[1]
         if err: 
