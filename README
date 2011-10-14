@@ -56,7 +56,6 @@ Example
 ============
 
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 driver= webdriver.Android()
 driver.get("http://www.symbio.com")

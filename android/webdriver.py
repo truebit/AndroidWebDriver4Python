@@ -21,5 +21,5 @@ class WebDriver(RemoteWebDriver):
         finally:
             self.service.stop()
 if __name__ == '__main__':
-    driver= Android()
+    driver= WebDriver()
     driver.get("http://www.symbio.com")

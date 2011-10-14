@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #
 # Copyright 2011 Webdriver_name committers
-# Copyright Symbio
+# Copyright Sean Wang : xiao.wang@symbio.com
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,15 +24,15 @@ from selenium.webdriver.common import utils
 
 class Service(object):
     """ Object that manages the starting and stopping of the AndroidDriver """
-    CMD_NOT_IN_PATH = "Could not find adb command, AndroidDriver needs Android SDK. \
-            Please download from http://developer.android.com/sdk/index.html\
-            and add directories 'tools' and 'platform-tools' in PATH."
+    CMD_NOT_IN_PATH = """Could not find adb command, AndroidDriver needs Android SDK.
+            Please download from http://developer.android.com/sdk/index.html
+            and add directories 'tools' and 'platform-tools' in PATH."""
 
     def __init__(self,device=None):
         """ Creates a new instance of the Service
             Args:
-                device: serial ID of the Android device. \
-                        Could be seen by command 'android devices'. \
+                device: serial ID of the Android device.
+                        Could be seen by command 'android devices'.
                         If only one device connected. you do not need to assign it
         """
         self.device= Service.initDevice(device)
@@ -67,25 +67,25 @@ class Service(object):
             if deviceInfo:
                 # check if all devices are online
                 if 'device' not in [i[1] for i in deviceInfo]:
-                    raise WebDriverException( "No device is good to go. \
-                            Reconnect devices and retry. \
-                            Only a deviceID followed with 'device' would work.")
+                    raise WebDriverException( """No device is good to go.
+                    Reconnect devices and retry.
+                    Only a deviceID followed with 'device' would work.""")
                 if deviceID:
                     # check if device with given deviceID is connected
                     if deviceID in [i[0] for i in deviceInfo]:
                         print "Connected to %s..." % deviceID
                         return deviceID
                     else:
-                        raise WebDriverException( "No device with serial ID '%s' found.\
-                                Plz make sure you got the right ID."%deviceID)
+                        raise WebDriverException("""No device with serial ID '%s' found.
+                        Plz make sure you got the right ID."""%deviceID)
                 else:
                     for i in deviceInfo:
                         if i[1] =='device':
                             print "Connected to %s..." % i[0]
                             return i[0] 
             else:
-                raise WebDriverException("No devices found, \
-                        plz make sure you have attached devices")
+                raise WebDriverException("""No devices found.
+                plz make sure you have attached devices""")
     @staticmethod
     def runAdbCmd(cmd):
         """run an adb command which has no output if successful"""
@@ -109,9 +109,9 @@ class Service(object):
         err=subprocess.Popen(r'%s shell am start -n org.openqa.selenium.android.app/.MainActivity'%self.adbCmd
                 ,stderr=PIPE,stdout=PIPE).communicate()[1]
         if err: 
-            raise WebDriverException("AndroidDriver needs to be installed on device.\
-                    Download android-server-2.x.apk \
-                    from http://code.google.com/p/selenium/downloads/list")
+            raise WebDriverException("""AndroidDriver needs to be installed on device.
+            Download android-server-2.x.apk from
+            http://code.google.com/p/selenium/downloads/list""")
         time.sleep(2)
 
     @property
@@ -123,8 +123,8 @@ class Service(object):
         """ Close AndroidDriver by sending BACK keyevent to device"""
         try:
             print 'stopping AndroidDriver'
-            subprocess.Popen(r'%s shell input keyevent 4'%self.adbCmd,stdout=PIPE, stderr=PIPE)
+            subprocess.Popen(r'%s shell input keyevent 4'%self.adbCmd,
+                    stdout=PIPE, stderr=PIPE)
         except:
-            print 'AndroidDriver was not closed, close by yourself by tapping back key to exit AndroidDriver on device.'
-
-
+            print """AndroidDriver was not closed. Close by yourself by tapping
+            back key to exit AndroidDriver on device."""
