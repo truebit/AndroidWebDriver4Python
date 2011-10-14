@@ -48,8 +48,12 @@ class Service(object):
         cmd2= 'adb start-server'
         cmd3= 'adb devices'
         subprocess.call(cmd1)
-        subprocess.Popen(cmd2,stdout=PIPE, stderr=PIPE)
-        time.sleep(5)
+        p=subprocess.Popen(cmd2,stdout=PIPE, stderr=PIPE)
+        count=0
+        while count<30:
+            time.sleep(1)
+            if p.poll() is 0:
+                break
         p=subprocess.Popen(cmd3,stdout=PIPE, stderr=PIPE)
         output, error = p.communicate()
         if error:
@@ -69,7 +73,7 @@ class Service(object):
                 if deviceID:
                     # check if device with given deviceID is connected
                     if deviceID in [i[0] for i in deviceInfo]:
-                        print "Connecting to %s..." % deviceID
+                        print "Connected to %s..." % deviceID
                         return deviceID
                     else:
                         raise WebDriverException( "No device with serial ID '%s' found.\
@@ -77,44 +81,39 @@ class Service(object):
                 else:
                     for i in deviceInfo:
                         if i[1] =='device':
-                            print "Connecting to %s..." % i[0]
+                            print "Connected to %s..." % i[0]
                             return i[0] 
             else:
                 raise WebDriverException("No devices found, \
                         plz make sure you have attached devices")
-
+    @staticmethod
+    def runAdbCmd(cmd):
+        """run an adb command which has no output if successful"""
+        out=''
+        out=subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        if out:
+            raise WebDriverException(out)
 
     def start(self):
         """ Starts the AndroidDriver Service. 
             @Exceptions
                 WebDriverException : Raised either when it can't start the service
                     or when it can't connect to the service"""
-        err=''
-        print 'start forward'
-        err=subprocess.Popen(r'%s forward tcp:8080 tcp:8080'%self.adbCmd,stdout=PIPE, stderr=PIPE).communicate()[1]
-        if err:
-            raise WebDriverException(err)
 
-        try:
-            print 'start press back 4 times'
-            for i in xrange(4):
-                subprocess.call(r'%s shell input keyevent 4'%self.adbCmd,
-                    stdout=PIPE, stderr=PIPE)
-            print 'start activity'
-            subprocess.call(r'%s shell am start -n org.openqa.selenium.android.app/.MainActivity'%self.adbCmd,
-                    stdout=PIPE, stderr=PIPE)
-            time.sleep(2)
-        except:
-            raise WebDriverException(
-                "AndroidDriver needs to be installed on device.\
-                Download android-server-2.x.apk \
-                from http://code.google.com/p/selenium/downloads/list")
-        count = 0
-        while not utils.is_connectable(8080):
-            count += 1
-            time.sleep(1)
-            if count == 30:
-                 raise WebDriverException("Can not connect to the AndroidDriver")
+        print 'start forward'
+        Service.runAdbCmd('%s forward tcp:8080 tcp:8080'%self.adbCmd)
+        print 'start press back 4 times'
+        for i in xrange(4):
+            (r'%s shell input keyevent 4'%self.adbCmd)
+        print 'start activity'
+        err=subprocess.Popen(r'%s shell am start -n org.openqa.selenium.android.app/.MainActivity'%self.adbCmd
+                ,stderr=PIPE,stdout=PIPE).communicate()[1]
+        if err: 
+            raise WebDriverException("AndroidDriver needs to be installed on device.\
+                    Download android-server-2.x.apk \
+                    from http://code.google.com/p/selenium/downloads/list")
+        time.sleep(2)
+
     @property
     def service_url(self):
         """ Gets the url of the ChromeDriver Service """
