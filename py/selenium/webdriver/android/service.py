@@ -47,14 +47,14 @@ class Service(object):
         cmd1= 'adb kill-server'
         cmd2= 'adb start-server'
         cmd3= 'adb devices'
-        subprocess.call(cmd1)
-        p=subprocess.Popen(cmd2,stdout=PIPE, stderr=PIPE)
+        subprocess.call(cmd1,shell=True)
+        p=subprocess.Popen(cmd2,stdout=PIPE, stderr=PIPE,shell=True)
         count=0
         while count<30:
             time.sleep(1)
             if p.poll() is 0:
                 break
-        p=subprocess.Popen(cmd3,stdout=PIPE, stderr=PIPE)
+        p=subprocess.Popen(cmd3,stdout=PIPE, stderr=PIPE,shell=True)
         output, error = p.communicate()
         if error:
             raise WebDriverException(error+'\n'+Service.CMD_NOT_IN_PATH)
