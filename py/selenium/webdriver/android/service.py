@@ -73,7 +73,7 @@ class Service(object):
             if deviceID:
                 # check if device with given deviceID is connected
                 if deviceID in [i[0] for i in deviceInfo]:
-                    print "Connected to %s..." % deviceID
+                    #print "Connected to %s..." % deviceID
                     return deviceID
                 else:
                     raise WebDriverException("""No device with serial ID '%s' found.
@@ -81,7 +81,7 @@ class Service(object):
             else:
                 for i in deviceInfo:
                     if i[1] =='device':
-                        print "Connected to %s..." % i[0]
+                        #print "Connected to %s..." % i[0]
                         return i[0] 
         else:
             raise WebDriverException("""No devices found.
@@ -93,16 +93,17 @@ class Service(object):
                 WebDriverException : Raised either when it can't start the service
                     or when it can't connect to the service"""
 
-        print 'start tcp port 8080 forwarding'
+        #print 'start tcp port 8080 forwarding'
         subprocess.call('%s forward tcp:8080 tcp:8080'%self.adbCmd,shell=True)
-        print 'stop existing android server by sending back key'
+
+        #print 'stop existing android server by sending back key'
         # this is not mandatory as we already killed adb server, but could this
         # decrease the webview created in andriod server application. maybe
         # it's a bug to create one webview per launch of app?
         for i in xrange(4):
             subprocess.call(r'%s shell input keyevent 4'%self.adbCmd,shell=True)
 
-        print 'start android server activity'
+        #print 'start android server activity'
         output=subprocess.check_output(r'%s shell am start -n %s'%(self.adbCmd,
             Service.ANDROID_DRIVER_CLIENT_APP_CMP),
             stderr=subprocess.STDOUT,shell=True).split()
@@ -112,6 +113,7 @@ class Service(object):
             http://code.google.com/p/selenium/downloads/list""")
         # wait for WebDriver Client to be launched completely
         time.sleep(2)
+        #print "Device %s is ready." % repr(self.device)
 
     @property
     def service_url(self):
