@@ -59,6 +59,8 @@ driver= webdriver.Android()
 driver.get("http://www.symbio.com")
 driver.quit()
 
+If you want more detailed example, plz see demo/demo.py
+
 ============
 Documentation
 ============
