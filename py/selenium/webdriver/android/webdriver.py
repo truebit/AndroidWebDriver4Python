@@ -21,6 +21,7 @@ class WebDriver(RemoteWebDriver):
         finally:
             self.service.stop()
 if __name__ == '__main__':
-    driver= WebDriver('emulator-5554')
+    #driver= WebDriver('emulator-5554')
+    driver= WebDriver()
     driver.get("http://www.symbio.com")
     driver.quit()

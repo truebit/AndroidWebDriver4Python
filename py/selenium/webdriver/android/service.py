@@ -28,6 +28,8 @@ class Service(object):
             Please download from http://developer.android.com/sdk/index.html
             and add directories 'tools' and 'platform-tools' in PATH."""
 
+    ANDROID_DRIVER_CLIENT_APP_CMP= r'org.openqa.selenium.android.app/.MainActivity'
+
     def __init__(self,device=None):
         """ Creates a new instance of the Service
             Args:
@@ -47,52 +49,43 @@ class Service(object):
         cmd1= 'adb kill-server'
         cmd2= 'adb start-server'
         cmd3= 'adb devices'
-        subprocess.call(cmd1,shell=True)
+        ret=subprocess.call(cmd1,stdout=PIPE, stderr=PIPE,shell=True)
+        if ret:
+            raise WebDriverException(Service.CMD_NOT_IN_PATH)
         p=subprocess.Popen(cmd2,stdout=PIPE, stderr=PIPE,shell=True)
         count=0
         while count<30:
             time.sleep(1)
             if p.poll() is 0:
                 break
-        p=subprocess.Popen(cmd3,stdout=PIPE, stderr=PIPE,shell=True)
-        output, error = p.communicate()
-        if error:
-            raise WebDriverException(error+'\n'+Service.CMD_NOT_IN_PATH)
-        if output:
-            output = output.split()
-            del output[:4]
-            for i, v in enumerate(output):
-                if i + 1 < len(output) and i % 2 == 0:
-                    deviceInfo.append((v, output[i + 1]))
-            if deviceInfo:
-                # check if all devices are online
-                if 'device' not in [i[1] for i in deviceInfo]:
-                    raise WebDriverException( """No device is good to go.
-                    Reconnect devices and retry.
-                    Only a deviceID followed with 'device' would work.""")
-                if deviceID:
-                    # check if device with given deviceID is connected
-                    if deviceID in [i[0] for i in deviceInfo]:
-                        print "Connected to %s..." % deviceID
-                        return deviceID
-                    else:
-                        raise WebDriverException("""No device with serial ID '%s' found.
-                        Plz make sure you got the right ID."""%deviceID)
+        else:
+            raise WebDriverException("adb could not get device info after 30 seconds.")
+        output=subprocess.check_output(cmd3,shell=True).split()[4:]
+        for i, v in enumerate(output):
+            if i + 1 < len(output) and i % 2 == 0:
+                deviceInfo.append((v, output[i + 1]))
+        if deviceInfo:
+            # check if all devices are online
+            if 'device' not in [i[1] for i in deviceInfo]:
+                raise WebDriverException( """No device is good to go.
+                Reconnect devices and retry.
+                Only a deviceID followed with 'device' would work.""")
+            if deviceID:
+                # check if device with given deviceID is connected
+                if deviceID in [i[0] for i in deviceInfo]:
+                    print "Connected to %s..." % deviceID
+                    return deviceID
                 else:
-                    for i in deviceInfo:
-                        if i[1] =='device':
-                            print "Connected to %s..." % i[0]
-                            return i[0] 
+                    raise WebDriverException("""No device with serial ID '%s' found.
+                    Plz make sure you got the right ID."""%deviceID)
             else:
-                raise WebDriverException("""No devices found.
-                plz make sure you have attached devices""")
-    @staticmethod
-    def runAdbCmd(cmd):
-        """run an adb command which has no output if successful"""
-        out=''
-        out=subprocess.check_output(cmd, stderr=subprocess.STDOUT,shell=True)
-        if out:
-            raise WebDriverException(out)
+                for i in deviceInfo:
+                    if i[1] =='device':
+                        print "Connected to %s..." % i[0]
+                        return i[0] 
+        else:
+            raise WebDriverException("""No devices found.
+            plz make sure you have attached devices""")
 
     def start(self):
         """ Starts the AndroidDriver Service. 
@@ -101,21 +94,23 @@ class Service(object):
                     or when it can't connect to the service"""
 
         print 'start tcp port 8080 forwarding'
-        Service.runAdbCmd('%s forward tcp:8080 tcp:8080'%self.adbCmd)
+        subprocess.call('%s forward tcp:8080 tcp:8080'%self.adbCmd,shell=True)
         print 'stop existing android server by sending back key'
         # this is not mandatory as we already killed adb server, but could this
         # decrease the webview created in andriod server application. maybe
         # it's a bug to create one webview per launch of app?
         for i in xrange(4):
-            Service.runAdbCmd(r'%s shell input keyevent 4'%self.adbCmd)
+            subprocess.call(r'%s shell input keyevent 4'%self.adbCmd,shell=True)
 
         print 'start android server activity'
-        err=subprocess.Popen(r'%s shell am start -n org.openqa.selenium.android.app/.MainActivity'%self.adbCmd
-                ,stderr=PIPE,stdout=PIPE).communicate()[1]
-        if err: 
+        output=subprocess.check_output(r'%s shell am start -n %s'%(self.adbCmd,
+            Service.ANDROID_DRIVER_CLIENT_APP_CMP),
+            stderr=subprocess.STDOUT,shell=True).split()
+        if len(output)> 5: #if app not installed, there would be error messages
             raise WebDriverException("""AndroidDriver needs to be installed on device.
             Download android-server-2.x.apk from
             http://code.google.com/p/selenium/downloads/list""")
+        # wait for WebDriver Client to be launched completely
         time.sleep(2)
 
     @property
