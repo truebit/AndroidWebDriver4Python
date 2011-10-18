@@ -13,6 +13,7 @@ More infomation about *Selenium*, plz check http://code.google.com/p/selenium/
 # Installing
 
 To install this AndroidDriver for Python, you need:
+
 1. download AndroidWebDriver4Python using 
     git clone git://github.com/truebit/AndroidWebDriver4Python.git
 2. download and extract [Python client](http://pypi.python.org/pypi/selenium#downloads)
