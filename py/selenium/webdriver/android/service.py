@@ -49,9 +49,12 @@ class Service(object):
         cmd1= 'adb kill-server'
         cmd2= 'adb start-server'
         cmd3= 'adb devices'
-        ret=subprocess.call(cmd1,stdout=PIPE, stderr=PIPE,shell=True)
-        if ret:
-            raise WebDriverException(Service.CMD_NOT_IN_PATH)
+        err=subprocess.Popen(cmd1,stdout=PIPE, stderr=PIPE,shell=True).communicate()[1]
+        if err and 'server not running' not in err:
+            raise WebDriverException("ERR: %s MSG: %s"%(err,Service.CMD_NOT_IN_PATH))
+        #ret=subprocess.call(cmd1,stdout=PIPE, stderr=PIPE,shell=True)
+        #if ret:
+        #    raise WebDriverException(Service.CMD_NOT_IN_PATH)
         p=subprocess.Popen(cmd2,stdout=PIPE, stderr=PIPE,shell=True)
         count=0
         while count<30:
@@ -94,7 +97,7 @@ class Service(object):
                     or when it can't connect to the service"""
 
         #print 'start tcp port 8080 forwarding'
-        subprocess.call('%s forward tcp:8080 tcp:8080'%self.adbCmd,shell=True)
+        subprocess.call(r'%s forward tcp:8080 tcp:8080'%self.adbCmd,shell=True)
 
         #print 'stop existing android server by sending back key'
         # this is not mandatory as we already killed adb server, but could this
@@ -113,7 +116,7 @@ class Service(object):
             http://code.google.com/p/selenium/downloads/list""")
         # wait for WebDriver Client to be launched completely
         time.sleep(2)
-        #print "Device %s is ready." % repr(self.device)
+        print "AndroidDriver started on device %s" % repr(self.device)
 
     @property
     def service_url(self):
@@ -125,7 +128,7 @@ class Service(object):
         try:
             print 'stopping AndroidDriver'
             subprocess.Popen(r'%s shell input keyevent 4'%self.adbCmd,
-                    stdout=PIPE, stderr=PIPE)
+                    stdout=PIPE, stderr=PIPE,shell=True)
         except:
             print """AndroidDriver was not closed. Close by yourself by tapping
             back key to exit AndroidDriver on device."""
