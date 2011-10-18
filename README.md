@@ -13,17 +13,19 @@ More infomation about *Selenium*, plz check http://code.google.com/p/selenium/
 
 To install this AndroidDriver for Python, you need:
 
-1. download AndroidWebDriver4Python using 
-```
-$ git clone git://github.com/truebit/AndroidWebDriver4Python.git
-```
+1. download AndroidWebDriver4Python using command: 
+
+~~~~~
+    $ git clone git://github.com/truebit/AndroidWebDriver4Python.git
+~~~~~
+
 2. download and extract [Selenium Python client](http://pypi.python.org/pypi/selenium#downloads)
 3. copy the entire 'py' folder under AndroidWebDriver4Python to merge the
 same one in root directory of AndroidDriver for Python
-4. back to the root directory of Selenium Python Client, to install this
-modified version using command:
+4. back to the root directory of Selenium Python Client, to install this modified version using command:
+
 ```
-$ python setup.py install
+    $ python setup.py install
 ```
 
 Here you have installed this AndroidWebDriver4Python add-on.
@@ -37,7 +39,7 @@ There are some prerequisites to use AndroidWebDriver4Python.
 * connect USB cable between device and PC, install adb drivers
 
 # Example
-```python
+~~~~~ python
 from selenium import webdriver
 
 driver= webdriver.Android()
@@ -45,7 +47,7 @@ driver= webdriver.Android()
 #driver=webdriver.Android('emulator-5554')
 driver.get("http://www.symbio.com")
 driver.quit()
-```
+~~~~~
 
 If you want more detailed example, plz check [example.py](AndroidWebDriver4Python/example/example.py)
 
