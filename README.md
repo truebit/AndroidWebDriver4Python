@@ -35,10 +35,9 @@ $ python setup.py install
 Here you have installed this AndroidWebDriver4Python add-on.
 There are some prerequisites to use AndroidWebDriver4Python.
 
-* [Install Android SDK](http://developer.android.com/sdk/installing.html) and set its 'tools' and 'platform-tools' in your PATH
+* [Install Android SDK](http://developer.android.com/sdk/installing.html) and set its `tools` and `platform-tools` in your PATH
 * Install Android server side application [android-server-2.x.x.apk](http://code.google.com/p/selenium/downloads/list) on your device
-* enable 'USB Debugging' in your device and disable autolock, which normally could found from
-> Home>Settings>Applications>Development>USB debugging
+* enable `USB Debugging` in your device and disable autolock, which normally could found from `Home>Settings>Applications>Development>USB debugging`
 
 * connect USB cable between device and PC, install adb drivers
 
@@ -46,6 +45,8 @@ There are some prerequisites to use AndroidWebDriver4Python.
 ```python
 from selenium import webdriver
 
+# if only one device connected, you do not need to specifiy the serial id.
+# exmaple driver=webdriver.Android()
 driver1= webdriver.Android('HT1234567')
 driver2=webdriver.Android('091012345601E00D')
 driver1.get("http://www.symbio.com")
