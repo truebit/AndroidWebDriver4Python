@@ -2,7 +2,7 @@
 
 _Author: Sean Wang xiao.wang@symbio.com_
 
-AndroidWebDriver4Python is an add-on to [Selenium Python Client Driver](http://code.google.com/p/selenium/source/browse/trunk/py)
+AndroidWebDriver4Python is an add-on to [Selenium Python Client Driver](http://pypi.python.org/pypi/selenium)
 
 As I could not find Android WebDriver implementation in it,and I really like Python as opposed to Java. So I want to implement one.
 I know that I am a newbie, I do not expect to commit in the Selenium project.
