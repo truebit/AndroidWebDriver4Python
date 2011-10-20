@@ -30,7 +30,7 @@ class Service(object):
 
     ANDROID_DRIVER_CLIENT_APP_CMP= r'org.openqa.selenium.android.app/.MainActivity'
 
-    def __init__(self,device=None):
+    def __init__(self,device=None,port=0):
         """ Creates a new instance of the Service
             Args:
                 device: serial ID of the Android device.
@@ -39,6 +39,9 @@ class Service(object):
         """
         self.device= Service.initDevice(device)
         self.adbCmd= r'adb -s %s '%self.device
+        self.port = port
+        if self.port == 0:
+            self.port = utils.free_port()
 
     @staticmethod
     def initDevice(deviceID=None):
@@ -46,16 +49,9 @@ class Service(object):
         # as adb server launching process made the script stuck,
         # so I use hard-coded wait time to make it through
         # I do not know why subprocess could not get output in such situation
-        cmd1= 'adb kill-server'
-        cmd2= 'adb start-server'
-        cmd3= 'adb devices'
-        err=subprocess.Popen(cmd1,stdout=PIPE, stderr=PIPE,shell=True).communicate()[1]
-        if err and 'server not running' not in err:
-            raise WebDriverException("ERR: %s MSG: %s"%(err,Service.CMD_NOT_IN_PATH))
-        #ret=subprocess.call(cmd1,stdout=PIPE, stderr=PIPE,shell=True)
-        #if ret:
-        #    raise WebDriverException(Service.CMD_NOT_IN_PATH)
-        p=subprocess.Popen(cmd2,stdout=PIPE, stderr=PIPE,shell=True)
+        cmd1= 'adb start-server'
+        cmd2= 'adb devices'
+        p=subprocess.Popen(cmd1,stdout=PIPE, stderr=PIPE,shell=True)
         count=0
         while count<30:
             time.sleep(1)
@@ -63,14 +59,14 @@ class Service(object):
                 break
         else:
             raise WebDriverException("adb could not get device info after 30 seconds.")
-        output=subprocess.check_output(cmd3,shell=True).split()[4:]
+        output=subprocess.check_output(cmd2,shell=True).split()[4:]
         for i, v in enumerate(output):
             if i + 1 < len(output) and i % 2 == 0:
                 deviceInfo.append((v, output[i + 1]))
         if deviceInfo:
             # check if all devices are online
             if 'device' not in [i[1] for i in deviceInfo]:
-                raise WebDriverException( """No device is good to go.
+                raise WebDriverException( """No device is online.
                 Reconnect devices and retry.
                 Only a deviceID followed with 'device' would work.""")
             if deviceID:
@@ -79,7 +75,7 @@ class Service(object):
                     #print "Connected to %s..." % deviceID
                     return deviceID
                 else:
-                    raise WebDriverException("""No device with serial ID '%s' found.
+                    raise WebDriverException("""Could not find device with serial id %r.
                     Plz make sure you got the right ID."""%deviceID)
             else:
                 for i in deviceInfo:
@@ -97,12 +93,13 @@ class Service(object):
                     or when it can't connect to the service"""
 
         #print 'start tcp port 8080 forwarding'
-        subprocess.call(r'%s forward tcp:8080 tcp:8080'%self.adbCmd,shell=True)
+        subprocess.call(r'%s forward tcp:%d tcp:8080'%(self.adbCmd,self.port),shell=True)
 
-        #print 'stop existing android server by sending back key'
-        # this is not mandatory as we already killed adb server, but could this
+
+        # this is not mandatory as we already killed adb server, but this could 
         # decrease the webview created in andriod server application. maybe
         # it's a bug to create one webview per launch of app?
+        #print 'stop existing android server by sending back key'
         for i in xrange(4):
             subprocess.call(r'%s shell input keyevent 4'%self.adbCmd,shell=True)
 
@@ -120,8 +117,8 @@ class Service(object):
 
     @property
     def service_url(self):
-        """ Gets the url of the ChromeDriver Service """
-        return "http://127.0.0.1:8080/wd/hub"
+        """ Gets the url of the AndroidDriver Service """
+        return "http://127.0.0.1:%d/wd/hub"%self.port
 
     def stop(self):
         """ Close AndroidDriver by sending BACK keyevent to device"""
